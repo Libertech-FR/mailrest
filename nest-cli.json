@@ -1,0 +1,12 @@
+{
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "src",
+  "root": "src",
+  "compilerOptions": {
+    "assets": ["public/**/*"],
+    "watchAssets": true
+  },
+  "generateOptions": {
+    "spec": false
+  }
+}
