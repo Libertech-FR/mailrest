@@ -3,10 +3,9 @@ import { Body, Controller, Get, HttpStatus, Post, Req, Res, UseGuards } from '@n
 import { ModuleRef } from '@nestjs/core'
 import { AuthGuard } from '@nestjs/passport'
 import { Request, Response } from 'express'
-import { UserInterface } from '~/auth/ldap.interface'
-import { AbstractController } from '~/common/abstract.controller'
-import { Authorization } from '~/common/authorization.decorator'
-import { Public } from '~/common/public.decorator'
+import { AbstractController } from '~/abstract.controller'
+import { Authorization } from '~/authorization.decorator'
+import { Public } from '~/public.decorator'
 import { AuthService } from './auth.service'
 
 @Public()
@@ -22,10 +21,7 @@ export class AuthController extends AbstractController {
 
   @Post('ldap')
   @UseGuards(AuthGuard('ldap'))
-  public async authenticateWithLdap(
-    @Req() req: Request & { user: UserInterface },
-    @Res() res: Response,
-  ): Promise<Response> {
+  public async authenticateWithLdap(@Req() req: Request & { user: any }, @Res() res: Response): Promise<Response> {
     console.log(req.user)
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
@@ -43,7 +39,7 @@ export class AuthController extends AbstractController {
 
   @Get('check')
   @UseGuards(AuthGuard('jwt'))
-  public async check(@Req() req: Request & { user: UserInterface }, @Res() res: Response): Promise<Response> {
+  public async check(@Req() req: Request & { user: any }, @Res() res: Response): Promise<Response> {
     const user = req.user
     delete user.cryptpasswd
     return res.status(HttpStatus.OK).json({ user })

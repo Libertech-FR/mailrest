@@ -1,12 +1,9 @@
-'use strict'
-
 import { BadRequestException, Injectable, Logger, UnauthorizedException } from '@nestjs/common'
 import { ModuleRef } from '@nestjs/core'
-import { AbstractService } from '~/common/abstract.service'
+import { AbstractService } from '~/abstract.service'
 import { createHash, randomBytes } from 'crypto'
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis'
 import { JwtService, JwtSignOptions } from '@nestjs/jwt'
-import { UserInterface } from '~/auth/ldap.interface'
 
 @Injectable()
 export class AuthService extends AbstractService {
@@ -20,7 +17,7 @@ export class AuthService extends AbstractService {
     super({ moduleRef })
   }
 
-  public async retrieveSession(id: string, token: string): Promise<{ user: UserInterface }> {
+  public async retrieveSession(id: string, token: string): Promise<{ user: any }> {
     const refreshKeyPath = AuthService.generateRefreshKeyPath(id, token)
     const session = await this.redis.get(refreshKeyPath)
     if (!session) {
@@ -43,16 +40,20 @@ export class AuthService extends AbstractService {
       await this.redis.set(
         AuthService.generateRefreshKeyPath(subject, refreshKey),
         JSON.stringify({ user }),
-        'EX', 60 * 60 * 4,
+        'EX',
+        60 * 60 * 4,
       )
     }
     if (!refreshKey) refreshKey = createHash('sha1').update(refreshToken).digest('hex')
     return {
       refreshToken,
-      accessToken: this.jwtService.sign({ refreshKey }, {
-        subject,
-        expiresIn: 60 * 5,
-      }),
+      accessToken: this.jwtService.sign(
+        { refreshKey },
+        {
+          subject,
+          expiresIn: 60 * 5,
+        },
+      ),
     }
   }
 
@@ -70,7 +71,7 @@ export class AuthService extends AbstractService {
     const session = await this.redis.get(refreshKeyPath)
     try {
       const payload = JSON.parse(session)
-      if (await this.redis.ttl(refreshKeyPath) < 60) {
+      if ((await this.redis.ttl(refreshKeyPath)) < 60) {
         currentRefreshToken = null
         await this.redis.del(refreshKeyPath)
       }
@@ -88,8 +89,6 @@ export class AuthService extends AbstractService {
   }
 
   public static generateRefreshKeyPath(id: string, refreshKey: string): string {
-    return [
-      'auth', 'user', id, 'refresh', refreshKey,
-    ].join('.')
+    return ['auth', 'user', id, 'refresh', refreshKey].join('.')
   }
 }

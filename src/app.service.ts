@@ -1,5 +1,5 @@
 'use strict'
-import { AbstractService } from '~/common/abstract.service'
+import { AbstractService } from '~/abstract.service'
 import { readFileSync } from 'fs'
 import { pick } from 'lodash'
 import { Injectable } from '@nestjs/common'

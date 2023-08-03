@@ -1,11 +1,7 @@
-'use strict'
-
 import { Module } from '@nestjs/common'
 import { PassportModule } from '@nestjs/passport'
 import { ConfigModule, ConfigService } from '@nestjs/config'
-
 import { JwtStrategy } from '~/auth/jwt.strategy'
-import { LdapStrategy } from '~/auth/ldap.strategy'
 import { JwtModule } from '@nestjs/jwt'
 import { AuthService } from '~/auth/auth.service'
 import { AuthController } from '~/auth/auth.controller'
@@ -27,16 +23,8 @@ import { AuthController } from '~/auth/auth.controller'
       }),
     }),
   ],
-  providers: [
-    AuthService,
-    JwtStrategy,
-    LdapStrategy,
-  ],
+  providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
-  exports: [
-    PassportModule,
-    JwtModule,
-  ],
+  exports: [PassportModule, JwtModule],
 })
-export class AuthModule {
-}
+export class AuthModule {}
