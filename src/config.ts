@@ -5,12 +5,16 @@ import { JwtModuleOptions } from '@nestjs/jwt'
 import { IAuthModuleOptions } from '@nestjs/passport'
 import { BinaryLike, CipherCCMTypes, CipherGCMTypes, CipherKey, createHash } from 'crypto'
 import { SwaggerCustomOptions } from '@nestjs/swagger'
+import setupAccounts, { AccountsMetadataV1 } from './accounts/accounts.setup'
 
 export interface ConfigInstance {
   application: NestApplicationContextOptions
   ioredis: {
     uri: string
     options: RedisOptions
+  }
+  mailer: {
+    accounts: AccountsMetadataV1[]
   }
   crypt: {
     algorithm: string | CipherCCMTypes | CipherGCMTypes
@@ -35,7 +39,8 @@ export interface PassportConfigInstance {
   }
 }
 
-export default (): ConfigInstance => {
+export default async (): Promise<ConfigInstance> => {
+  const mailerAccounts = await setupAccounts()
   return {
     application: {
       logger: process.env.LOGGER
@@ -49,6 +54,9 @@ export default (): ConfigInstance => {
       options: {
         showFriendlyErrorStack: true,
       },
+    },
+    mailer: {
+      accounts: mailerAccounts,
     },
     jwt: {
       options: {

@@ -1,5 +1,5 @@
 import { RedisModule } from '@nestjs-modules/ioredis'
-import { Module } from '@nestjs/common'
+import { ClassSerializerInterceptor, Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { RedisOptions } from 'ioredis'
 import { AuthModule } from '~/auth/auth.module'
@@ -8,7 +8,10 @@ import { AccountsModule } from './accounts/accounts.module'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { TokensModule } from './tokens/tokens.module'
-import { WebhooksModule } from './webhooks/webhooks.module';
+import { WebhooksModule } from './webhooks/webhooks.module'
+import { ImapflowModule } from './imapflow/imapflow.module'
+import { AccountsMetadataV1 } from './accounts/accounts.setup'
+import { APP_INTERCEPTOR } from '@nestjs/core'
 
 @Module({
   imports: [
@@ -26,6 +29,13 @@ import { WebhooksModule } from './webhooks/webhooks.module';
         },
       }),
     }),
+    ImapflowModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService) => ({
+        config: config.get<AccountsMetadataV1[]>('mailer.accounts'),
+      }),
+    }),
     AuthModule,
     TokensModule,
     AccountsModule.register(),
@@ -34,6 +44,10 @@ import { WebhooksModule } from './webhooks/webhooks.module';
   controllers: [AppController],
   providers: [
     AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ClassSerializerInterceptor,
+    },
     // {
     //   provide: APP_GUARD,
     //   useClass: AuthGuard,
