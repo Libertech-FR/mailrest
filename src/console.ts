@@ -1,14 +1,11 @@
 // noinspection TypeScriptValidateJSTypes
-
-'use strict'
-
 import { CommandFactory } from 'nest-commander'
 import configInstance from '~/config'
 import { AppModule } from '~/app.module'
 
-(async (): Promise<void> => {
+;(async (): Promise<void> => {
   try {
-    const config = configInstance()
+    const config = await configInstance()
     const app = await CommandFactory.runWithoutClosing(AppModule, {
       logger: config.application.logger,
       errorHandler: (err) => {

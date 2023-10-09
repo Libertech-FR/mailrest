@@ -1,6 +1,6 @@
 IMGNAME?=ghcr.io/libertech-fr/mailrest
 APPNAME?=mailrest
-APPPORT?=7000
+APPPORT?=7200
 
 init:
 	@docker build -t $(IMGNAME) .
@@ -22,7 +22,7 @@ dev:
 		--add-host host.docker.internal:host-gateway \
 		--name $(APPNAME) \
 		--network dev \
-		-p $(APPPORT):7000 \
+		-p $(APPPORT):7200 \
 		-v $(CURDIR):/usr/src/app \
 		$(IMGNAME) yarn start:dev
 
@@ -46,8 +46,8 @@ dbs:
 		redis
 
 stop:
-	@docker stop $(APPNAME)-redis || true
 	@docker stop $(APPNAME) || true
+	@docker stop $(APPNAME)-redis || true
 
 rm:
 	docker rm $(shell docker ps -a -q -f name=$(APPNAME))

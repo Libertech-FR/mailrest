@@ -1,26 +1,41 @@
-import { Injectable } from '@nestjs/common';
-import { CreateTokenDto } from './dto/create-token.dto';
-import { UpdateTokenDto } from './dto/update-token.dto';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common'
+import { LRUCache } from 'lru-cache'
+import { ModuleRef } from '@nestjs/core'
+import { readTokensFile, TokensFileV1, TokensMetadataV1, writeTokensFile } from '~/tokens/tokens.setup'
+import { AbstractService } from '~/_common/abstracts/abstract.service'
 
 @Injectable()
-export class TokensService {
-  create(createTokenDto: CreateTokenDto) {
-    return 'This action adds a new token';
+export class TokensService extends AbstractService {
+  protected cache: LRUCache<string, TokensFileV1>
+  protected logger: Logger = new Logger(TokensService.name)
+
+  public constructor(protected readonly moduleRef: ModuleRef) {
+    super({ moduleRef })
+    this.cache = new LRUCache({
+      max: 100,
+      maxSize: 1000,
+      sizeCalculation: () => 1,
+      ttl: 1000 * 60 * 5,
+    })
   }
 
-  findAll() {
-    return `This action returns all tokens`;
+  public async create(data: Partial<TokensMetadataV1>): Promise<Partial<TokensMetadataV1>> {
+    const tokens = await readTokensFile(this.cache)
+    const token = new TokensMetadataV1()
+    Object.assign(token, data)
+    tokens.tokens.push(token)
+    await writeTokensFile(tokens, this.cache)
+    return token
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} token`;
-  }
-
-  update(id: number, updateTokenDto: UpdateTokenDto) {
-    return `This action updates a #${id} token`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} token`;
+  public async delete(key: string): Promise<Partial<TokensMetadataV1>> {
+    const tokens = await readTokensFile(this.cache)
+    const token = tokens.tokens.find((t) => t.key === key)
+    if (!token) {
+      throw new NotFoundException(`Token not found: ${key}`)
+    }
+    tokens.tokens = tokens.tokens.filter((a) => a.id !== key)
+    await writeTokensFile(tokens, this.cache)
+    return token
   }
 }

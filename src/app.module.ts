@@ -8,7 +8,17 @@ import { AccountsModule } from './accounts/accounts.module'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { TokensModule } from './tokens/tokens.module'
-import { WebhooksModule } from './webhooks/webhooks.module';
+import { ImapflowModule } from './imapflow/imapflow.module'
+import { AccountsMetadataV1 } from './accounts/accounts.setup'
+import { APP_GUARD, APP_PIPE } from '@nestjs/core'
+import { CronModule } from '~/accounts/cron/cron.module'
+import { AuthGuard } from '~/_common/guards/auth.guard'
+import { AccessControlModule, RolesBuilder } from "nest-access-control";
+import { AclsService } from "~/acls/acls.service";
+import { AclsModule } from "~/acls/acls.module";
+import { AclGuard } from "~/_common/guards/acl.guard";
+import { DtoValidationPipe } from '~/_common/pipes/dto-validation.pipe'
+import { ScheduleModule } from '@nestjs/schedule'
 
 @Module({
   imports: [
@@ -26,18 +36,43 @@ import { WebhooksModule } from './webhooks/webhooks.module';
         },
       }),
     }),
-    AuthModule,
-    TokensModule,
+    ImapflowModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService) => ({
+        config: config.get<AccountsMetadataV1[]>('mailer.accounts'),
+      }),
+    }),
+    AccessControlModule.forRootAsync({
+      imports: [AclsModule],
+      inject: [AclsService],
+      useFactory: async (aclService: AclsService) => {
+        return new RolesBuilder(
+          await aclService.getGrantsObject(),
+        )
+      },
+    }),
+    ScheduleModule.forRoot(),
     AccountsModule.register(),
-    WebhooksModule,
+    AuthModule,
+    CronModule,
+    TokensModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: AuthGuard,
-    // },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AclGuard,
+    },
+    {
+      provide: APP_PIPE,
+      useClass: DtoValidationPipe,
+    },
   ],
 })
 export class AppModule {}

@@ -1,34 +1,38 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { MailboxesService } from './mailboxes.service';
-import { CreateMailboxDto } from './dto/create-mailbox.dto';
-import { UpdateMailboxDto } from './dto/update-mailbox.dto';
+import { Controller, Get, HttpStatus, Param, Res } from '@nestjs/common'
+import { MailboxesService } from './mailboxes.service'
+import { ApiTags } from '@nestjs/swagger'
+import { AbstractController } from '~/_common/abstracts/abstract.controller'
+import { ModuleRef } from '@nestjs/core'
+import { Response } from 'express'
+import { UseRoles } from 'nest-access-control'
+import { ScopesEnum } from '~/_common/enums/scopes.enum'
+import { ActionEnum } from '~/_common/enums/action.enum'
+import { ApiSimpleSearchDecorator } from '~/_common/decorators/api-simple-search.decorator'
+import { ListTreeDto } from '~/accounts/mailboxes/_dto/list-tree.dto'
 
-@Controller('mailboxes')
-export class MailboxesController {
-  constructor(private readonly mailboxesService: MailboxesService) {}
-
-  @Post()
-  create(@Body() createMailboxDto: CreateMailboxDto) {
-    return this.mailboxesService.create(createMailboxDto);
+@ApiTags('mailboxes')
+@Controller(':account([\\w-.]+)/mailboxes')
+export class MailboxesController extends AbstractController {
+  public constructor(
+    protected readonly moduleRef: ModuleRef,
+    protected readonly service: MailboxesService,
+  ) {
+    super(moduleRef)
   }
 
   @Get()
-  findAll() {
-    return this.mailboxesService.findAll();
+  @UseRoles({
+    resource: ScopesEnum.Accounts,
+    action: ActionEnum.Read,
+  })
+  @ApiSimpleSearchDecorator(ListTreeDto)
+  public async search(@Res() res: Response, @Param('account') account: string): Promise<any> {
+    const data = await this.service.search(account)
+    return res.json({
+      statusCode: HttpStatus.OK,
+      data,
+    })
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.mailboxesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMailboxDto: UpdateMailboxDto) {
-    return this.mailboxesService.update(+id, updateMailboxDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.mailboxesService.remove(+id);
-  }
+  //TODO: add other methods
 }

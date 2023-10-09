@@ -1,53 +1,44 @@
-import { InjectRedis, Redis } from '@nestjs-modules/ioredis'
-import { Body, Controller, Get, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common'
+import { Controller, Get, HttpStatus, Req, Res, UseGuards } from '@nestjs/common'
 import { ModuleRef } from '@nestjs/core'
 import { AuthGuard } from '@nestjs/passport'
 import { Request, Response } from 'express'
-import { AbstractController } from '~/abstract.controller'
-import { Authorization } from '~/authorization.decorator'
-import { Public } from '~/public.decorator'
+import { AbstractController } from '~/_common/abstracts/abstract.controller'
+import { Public } from '~/_common/decorators/public.decorator'
 import { AuthService } from './auth.service'
+import { ApiTags } from '@nestjs/swagger'
+import { ApiReadResponseDecorator } from '~/_common/decorators/api-read-response.decorator'
 
 @Public()
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController extends AbstractController {
   public constructor(
     protected moduleRef: ModuleRef,
     protected service: AuthService,
-    @InjectRedis() private readonly redis: Redis,
   ) {
     super(moduleRef)
   }
 
-  @Post('ldap')
-  @UseGuards(AuthGuard('ldap'))
-  public async authenticateWithLdap(@Req() req: Request & { user: any }, @Res() res: Response): Promise<Response> {
-    console.log(req.user)
+  @Get('info')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiReadResponseDecorator(null, {
+    schema: {
+      properties: {
+        statusCode: {
+          type: 'number',
+          enum: [HttpStatus.OK],
+        },
+        user: {
+          type: 'object',
+        },
+      },
+    },
+  })
+  public async info(@Req() req: Request & { user: Express.User }, @Res() res: Response): Promise<Response> {
+    const user = req.user
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
-      ...(await this.service.tokensDelivery(req.user)),
+      user,
     })
-  }
-
-  @Post('refresh')
-  public async refresh(@Body() body, @Res() res: Response): Promise<Response> {
-    return res.status(HttpStatus.CREATED).json({
-      statusCode: HttpStatus.CREATED,
-      ...(await this.service.refresh(body?.refreshToken)),
-    })
-  }
-
-  @Get('check')
-  @UseGuards(AuthGuard('jwt'))
-  public async check(@Req() req: Request & { user: any }, @Res() res: Response): Promise<Response> {
-    const user = req.user
-    delete user.cryptpasswd
-    return res.status(HttpStatus.OK).json({ user })
-  }
-
-  @Post('logout')
-  public async logout(@Authorization() auth, @Res() res: Response): Promise<Response> {
-    await this.service.clearSession(auth.sub, auth.refreshKey)
-    return res.status(HttpStatus.OK).json({ statusCode: HttpStatus.OK })
   }
 }
