@@ -4,7 +4,6 @@ import { ModuleRef } from '@nestjs/core'
 import { readFileSync } from 'fs'
 import { pick } from 'lodash'
 import os from 'os'
-import process from 'process'
 import { PackageJson } from 'types-package-json/'
 import v8 from 'v8'
 

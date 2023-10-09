@@ -1,34 +1,53 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { TokensService } from './tokens.service';
-import { CreateTokenDto } from './dto/create-token.dto';
-import { UpdateTokenDto } from './dto/update-token.dto';
+import { Body, Controller, Delete, HttpStatus, Param, Post, Res } from '@nestjs/common'
+import { TokensService } from './tokens.service'
+import { ModuleRef } from '@nestjs/core'
+import { AbstractController } from '~/_common/abstracts/abstract.controller'
+import { Response } from 'express'
+import { TokensMetadataV1 } from '~/tokens/tokens.setup'
+import { ApiTags, PartialType } from '@nestjs/swagger'
+import { UseRoles } from 'nest-access-control'
+import { ScopesEnum } from '~/_common/enums/scopes.enum'
+import { ActionEnum } from '~/_common/enums/action.enum'
+import { ApiCreateDecorator } from '~/_common/decorators/api-create.decorator'
+import { ApiDeletedResponseDecorator } from '~/_common/decorators/api-deleted-response.decorator'
 
+class InternalTokensMetadataV1 extends PartialType(TokensMetadataV1) {}
+
+@ApiTags('tokens')
 @Controller('tokens')
-export class TokensController {
-  constructor(private readonly tokensService: TokensService) {}
+export class TokensController extends AbstractController {
+  constructor(
+    protected readonly moduleRef: ModuleRef,
+    protected readonly service: TokensService,
+  ) {
+    super(moduleRef)
+  }
 
   @Post()
-  create(@Body() createTokenDto: CreateTokenDto) {
-    return this.tokensService.create(createTokenDto);
+  @UseRoles({
+    resource: ScopesEnum.Tokens,
+    action: ActionEnum.Read,
+  })
+  @ApiCreateDecorator(InternalTokensMetadataV1, InternalTokensMetadataV1)
+  public async create(@Res() res: Response, @Body() body: InternalTokensMetadataV1): Promise<Response> {
+    const data = await this.service.create(body)
+    return res.json({
+      statusCode: HttpStatus.CREATED,
+      data,
+    })
   }
 
-  @Get()
-  findAll() {
-    return this.tokensService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.tokensService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTokenDto: UpdateTokenDto) {
-    return this.tokensService.update(+id, updateTokenDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.tokensService.remove(+id);
+  @Delete(':token([\\w-.]+)')
+  @UseRoles({
+    resource: ScopesEnum.Tokens,
+    action: ActionEnum.Delete,
+  })
+  @ApiDeletedResponseDecorator(InternalTokensMetadataV1)
+  public async delete(@Res() res: Response, @Param('token') token: string): Promise<Response> {
+    const data = await this.service.delete(token)
+    return res.json({
+      statusCode: HttpStatus.OK,
+      data,
+    })
   }
 }

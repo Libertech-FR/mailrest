@@ -1,18 +1,26 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { ModuleRef } from '@nestjs/core'
 import { ImapFlow } from 'imapflow'
-import { find, pick } from 'lodash'
 import { LRUCache } from 'lru-cache'
-import { AbstractService } from '~/abstract.service'
+import { AbstractService } from '~/_common/abstracts/abstract.service'
 import { InjectImapflow } from '~/imapflow/imapflow.decorators'
 import { AccountsFileV1, AccountsMetadataV1, readAccountsFile, writeAccountsFile } from './accounts.setup'
+import { PartialType } from '@nestjs/swagger'
+
+class InternalAccountMetadataV1 extends PartialType(AccountsMetadataV1) {
+}
 
 @Injectable()
 export class AccountsService extends AbstractService {
   protected cache: LRUCache<string, AccountsFileV1>
   protected logger: Logger = new Logger(AccountsService.name)
-  public constructor(protected readonly moduleRef: ModuleRef, @InjectImapflow() protected imapflow: Map<string, ImapFlow>) {
+
+  public constructor(
+    protected readonly moduleRef: ModuleRef,
+    @InjectImapflow() protected imapflow: Map<string, ImapFlow>,
+  ) {
     super({ moduleRef })
+    // noinspection JSUnusedGlobalSymbols
     this.cache = new LRUCache({
       max: 100,
       maxSize: 1000,
@@ -21,12 +29,12 @@ export class AccountsService extends AbstractService {
     })
   }
 
-  public async search(): Promise<Partial<AccountsFileV1>> {
+  public async search(): Promise<InternalAccountMetadataV1[]> {
     const data = await readAccountsFile(this.cache)
-    return pick(data, ['accounts'])
+    return data.accounts
   }
 
-  public async create(data: Partial<AccountsMetadataV1>): Promise<Partial<AccountsMetadataV1>> {
+  public async create(data: InternalAccountMetadataV1): Promise<InternalAccountMetadataV1> {
     const accounts = await readAccountsFile(this.cache)
     const account = new AccountsMetadataV1()
     Object.assign(account, data)
@@ -35,18 +43,18 @@ export class AccountsService extends AbstractService {
     return account
   }
 
-  public async read(id: string): Promise<Partial<AccountsMetadataV1>> {
+  public async read(id: string): Promise<InternalAccountMetadataV1> {
     const data = await readAccountsFile(this.cache)
-    const account = find(data.accounts, { id })
+    const account = data.accounts.find((a) => a.id === id)
     if (!account) {
       throw new NotFoundException(`Account not found: ${id}`)
     }
     return account
   }
 
-  public async update(id: string, data: Partial<AccountsMetadataV1>): Promise<Partial<AccountsMetadataV1>> {
+  public async update(id: string, data: InternalAccountMetadataV1): Promise<InternalAccountMetadataV1> {
     const accounts = await readAccountsFile(this.cache)
-    const account: AccountsMetadataV1 = find(accounts.accounts, { id })
+    const account = accounts.accounts.find((a) => a.id === id)
     if (!account) {
       throw new NotFoundException(`Account not found: ${id}`)
     }
@@ -55,9 +63,9 @@ export class AccountsService extends AbstractService {
     return account
   }
 
-  public async delete(id: string): Promise<Partial<AccountsMetadataV1>> {
+  public async delete(id: string): Promise<InternalAccountMetadataV1> {
     const accounts = await readAccountsFile(this.cache)
-    const account = find(accounts.accounts, { id })
+    const account = accounts.accounts.find((a) => a.id === id)
     if (!account) {
       throw new NotFoundException(`Account not found: ${id}`)
     }

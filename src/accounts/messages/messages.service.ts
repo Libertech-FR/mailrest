@@ -1,28 +1,28 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { ModuleRef } from '@nestjs/core'
-import { FetchMessageObject, ImapFlow, MailboxObject } from 'imapflow'
+import { FetchMessageObject, FetchQueryObject, ImapFlow, MailboxLockObject } from 'imapflow'
 import { LRUCache } from 'lru-cache'
-import { omit, pick } from 'radash'
-import { AbstractService } from '~/abstract.service'
+import { omit } from 'radash'
+import { AbstractService } from '~/_common/abstracts/abstract.service'
 import { InjectImapflow } from '~/imapflow/imapflow.decorators'
 import { AccountsFileV1 } from '../accounts.setup'
 
 const defaultSearchOptions = {
   limit: 10,
-  offset: 0,
-}
-
-export interface SearchOptions {
-  limit?: number
-  offset?: number
+  skip: 0,
 }
 
 @Injectable()
 export class MessagesService extends AbstractService {
   protected cache: LRUCache<string, AccountsFileV1>
   protected logger: Logger = new Logger(MessagesService.name)
-  public constructor(protected readonly moduleRef: ModuleRef, @InjectImapflow() protected imapflow: Map<string, ImapFlow>) {
+
+  public constructor(
+    protected readonly moduleRef: ModuleRef,
+    @InjectImapflow() protected imapflow: Map<string, () => Promise<ImapFlow>>,
+  ) {
     super({ moduleRef })
+    // noinspection JSUnusedGlobalSymbols
     this.cache = new LRUCache({
       max: 100,
       maxSize: 1000,
@@ -31,19 +31,34 @@ export class MessagesService extends AbstractService {
     })
   }
 
-  public async search(account: string, mailbox: string, options?: SearchOptions): Promise<Partial<FetchMessageObject>[]> {
+  public async search(
+    account: string,
+    options?: {
+      mailbox?: string
+      limit?: number
+      skip?: number
+    },
+  ): Promise<[Partial<FetchMessageObject>[], number]> {
+    const mailbox = options?.mailbox || 'INBOX'
+    if (!this.imapflow.has(account)) throw new NotFoundException(`Account ${account} not found`)
+    let total = 0
     const data = []
     options = { ...defaultSearchOptions, ...options }
-    const lock = await this.imapflow.get(account).getMailboxLock(mailbox)
-    this.imapflow.get(account).mailboxOpen(mailbox)
+    const flow = await this.imapflow.get(account)()
+    let lock: MailboxLockObject
     try {
-      const seq = [options.offset + 1, options.limit !== -1 ? options.offset + options.limit : '*'].join(':')
-      console.log('seq', seq)
-      console.log('options', options)
-      const messages = await this.imapflow.get(account).fetch(seq, {
+      lock = await flow.getMailboxLock(mailbox)
+    } catch (e) {
+      throw new NotFoundException(`Mailbox ${mailbox} not found`)
+    }
+    try {
+      await flow.mailboxOpen(mailbox)
+      const listMessages = await flow.search({ seq: '1:*' })
+      total = listMessages.length
+      const seq = [options.skip + 1, options.limit !== -1 ? options.skip + options.limit : '*'].join(':')
+      const messages = flow.fetch(seq, {
         flags: true,
         envelope: true,
-        bodyStructure: true,
         uid: true,
       })
       for await (const message of messages) {
@@ -52,24 +67,81 @@ export class MessagesService extends AbstractService {
     } finally {
       lock.release()
     }
-    return data
+    return [data, total]
   }
 
-  public async read(account: string, mailbox: string, uid: string): Promise<Partial<FetchMessageObject>> {
-    let msg
-    const lock = await this.imapflow.get(account).getMailboxLock(mailbox)
+  public async read(
+    account: string,
+    uid: string,
+    options?: {
+      mailbox?: string
+      query?: FetchQueryObject
+    },
+  ): Promise<Partial<FetchMessageObject>> {
+    const mailbox = options?.mailbox || 'INBOX'
+    if (!this.imapflow.has(account)) throw new NotFoundException(`Account ${account} not found`)
+    let msg: Partial<FetchMessageObject>
+    const flow = await this.imapflow.get(account)()
+    let lock: MailboxLockObject
     try {
-      const mb = this.imapflow.get(account).mailbox as MailboxObject
-      const message = await this.imapflow.get(account).fetchOne('' + mb.exists, {
-        flags: true,
-        envelope: true,
-        bodyStructure: true,
-        uid: true,
-      })
+      lock = await flow.getMailboxLock(mailbox)
+    } catch (e) {
+      throw new NotFoundException(`Mailbox ${mailbox} not found`)
+    }
+    try {
+      const message = await flow.fetchOne(
+        uid,
+        options?.query || {
+          flags: true,
+          envelope: true,
+          bodyStructure: true,
+          uid: true,
+        },
+      )
       msg = omit(message, ['modseq'])
     } finally {
       lock.release()
     }
     return msg
+  }
+
+  public async readSource(
+    account: string,
+    uid: string,
+    options?: {
+      mailbox?: string
+    },
+  ): Promise<Partial<FetchMessageObject>> {
+    const mailbox = options?.mailbox || 'INBOX'
+    return this.read(account, uid, {
+      mailbox,
+      query: {
+        source: true,
+        uid: true,
+      },
+    })
+  }
+
+  public async delete(
+    account: string,
+    uid: string,
+    options?: {
+      mailbox?: string
+    },
+  ): Promise<boolean> {
+    const mailbox = options?.mailbox || 'INBOX'
+    if (!this.imapflow.has(account)) throw new NotFoundException(`Account ${account} not found`)
+    const flow = await this.imapflow.get(account)()
+    let lock: MailboxLockObject
+    try {
+      lock = await flow.getMailboxLock(mailbox)
+    } catch (e) {
+      throw new NotFoundException(`Mailbox ${mailbox} not found`)
+    }
+    try {
+      return await flow.messageDelete(uid)
+    } finally {
+      lock.release()
+    }
   }
 }

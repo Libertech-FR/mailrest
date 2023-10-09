@@ -2,7 +2,9 @@ import { Controller, Get, Res, VERSION_NEUTRAL } from '@nestjs/common'
 import { ModuleRef } from '@nestjs/core'
 import { Response } from 'express'
 import { AppService } from './app.service'
+import { Public } from "~/_common/decorators/public.decorator";
 
+@Public()
 @Controller({
   version: VERSION_NEUTRAL,
 })

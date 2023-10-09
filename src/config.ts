@@ -6,6 +6,7 @@ import { IAuthModuleOptions } from '@nestjs/passport'
 import { BinaryLike, CipherCCMTypes, CipherGCMTypes, CipherKey, createHash } from 'crypto'
 import { SwaggerCustomOptions } from '@nestjs/swagger'
 import setupAccounts, { AccountsMetadataV1 } from './accounts/accounts.setup'
+import setupTokens, { TokensMetadataV1 } from "~/tokens/tokens.setup";
 
 export interface ConfigInstance {
   application: NestApplicationContextOptions
@@ -30,6 +31,7 @@ export interface ConfigInstance {
     api: string
     options?: SwaggerCustomOptions
   }
+  tokens: TokensMetadataV1[]
 }
 
 export interface PassportConfigInstance {
@@ -41,6 +43,7 @@ export interface PassportConfigInstance {
 
 export default async (): Promise<ConfigInstance> => {
   const mailerAccounts = await setupAccounts()
+  const tokens = await setupTokens()
   return {
     application: {
       logger: process.env.LOGGER
@@ -78,6 +81,7 @@ export default async (): Promise<ConfigInstance> => {
       },
       modules: {},
     },
+    tokens,
     swagger: {
       path: '/swagger',
       api: '/swagger/json',

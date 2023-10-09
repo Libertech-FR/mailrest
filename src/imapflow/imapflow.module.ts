@@ -5,6 +5,7 @@ import { ImapflowCoreModule } from './imapflow.core-module'
 @Global()
 @Module({})
 export class ImapflowModule {
+  // noinspection JSUnusedGlobalSymbols
   public static forRoot(options: ImapflowModuleOptions, connection?: string): DynamicModule {
     return {
       module: ImapflowModule,

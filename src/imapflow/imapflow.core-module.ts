@@ -2,7 +2,6 @@ import { DynamicModule, Global, Module, Provider } from '@nestjs/common'
 import { ImapflowModuleAsyncOptions, ImapflowModuleOptions, ImapflowModuleOptionsFactory } from './imapflow.interfaces'
 import { createImapflowConnection, getImapflowConnectionToken, getImapflowOptionsToken } from './imapflow.utils'
 
-// noinspection JSUnusedGlobalSymbols
 @Global()
 @Module({})
 export class ImapflowCoreModule {
