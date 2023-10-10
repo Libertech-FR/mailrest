@@ -7,6 +7,8 @@ import { BinaryLike, CipherCCMTypes, CipherGCMTypes, CipherKey, createHash } fro
 import { SwaggerCustomOptions } from '@nestjs/swagger'
 import setupAccounts, { AccountsMetadataV1 } from './accounts/accounts.setup'
 import setupTokens, { TokensMetadataV1 } from "~/tokens/tokens.setup";
+import { MailerOptions } from '@nestjs-modules/mailer'
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter'
 
 export interface ConfigInstance {
   application: NestApplicationContextOptions
@@ -16,6 +18,7 @@ export interface ConfigInstance {
   }
   mailer: {
     accounts: AccountsMetadataV1[]
+    options?: MailerOptions
   }
   crypt: {
     algorithm: string | CipherCCMTypes | CipherGCMTypes
@@ -60,6 +63,24 @@ export default async (): Promise<ConfigInstance> => {
     },
     mailer: {
       accounts: mailerAccounts,
+      options: {
+        transports: mailerAccounts.reduce((acc, account) => {
+          if (account.smtp) {
+            acc[account.id] = account.smtp
+          }
+          return acc
+        }, {}),
+        defaults: {
+          from: '"nest-modules" <modules@nestjs.com>',
+        },
+        template: {
+          dir: __dirname + '/../../templates',
+          adapter: new HandlebarsAdapter(),
+          options: {
+            strict: true,
+          },
+        },
+      },
     },
     jwt: {
       options: {

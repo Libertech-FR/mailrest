@@ -13,12 +13,14 @@ import { AccountsMetadataV1 } from './accounts/accounts.setup'
 import { APP_GUARD, APP_PIPE } from '@nestjs/core'
 import { CronModule } from '~/accounts/cron/cron.module'
 import { AuthGuard } from '~/_common/guards/auth.guard'
-import { AccessControlModule, RolesBuilder } from "nest-access-control";
-import { AclsService } from "~/acls/acls.service";
-import { AclsModule } from "~/acls/acls.module";
-import { AclGuard } from "~/_common/guards/acl.guard";
+import { AccessControlModule, RolesBuilder } from 'nest-access-control'
+import { AclsService } from '~/acls/acls.service'
+import { AclsModule } from '~/acls/acls.module'
+import { AclGuard } from '~/_common/guards/acl.guard'
 import { DtoValidationPipe } from '~/_common/pipes/dto-validation.pipe'
 import { ScheduleModule } from '@nestjs/schedule'
+import { MailerModule, MailerOptions } from '@nestjs-modules/mailer'
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter'
 
 @Module({
   imports: [
@@ -43,13 +45,18 @@ import { ScheduleModule } from '@nestjs/schedule'
         config: config.get<AccountsMetadataV1[]>('mailer.accounts'),
       }),
     }),
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService) => ({
+        ...config.get<MailerOptions>('mailer.options'),
+      }),
+    }),
     AccessControlModule.forRootAsync({
       imports: [AclsModule],
       inject: [AclsService],
       useFactory: async (aclService: AclsService) => {
-        return new RolesBuilder(
-          await aclService.getGrantsObject(),
-        )
+        return new RolesBuilder(await aclService.getGrantsObject())
       },
     }),
     ScheduleModule.forRoot(),

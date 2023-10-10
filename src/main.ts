@@ -1,6 +1,6 @@
 // noinspection JSUnresolvedReference
 
-import { BadRequestException, HttpStatus, INestApplication, Logger, ValidationError, ValidationPipe } from '@nestjs/common'
+import { INestApplication, Logger } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import { Response } from 'express'
@@ -9,6 +9,7 @@ import { join } from 'path'
 import configInstance from './config'
 import { AppModule } from './app.module'
 import passport from 'passport'
+import 'multer'
 
 declare const module: any
 ;(async (): Promise<void> => {

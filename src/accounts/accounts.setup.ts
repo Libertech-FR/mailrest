@@ -98,6 +98,16 @@ export class AccountsMetadataImapV1 implements ImapFlowOptions {
   public maxIdleTime: number = 60_000
 }
 
+export class AccountsMetadataSmtpAuthV1 {
+  @IsString()
+  @ApiProperty()
+  public user: string
+
+  @IsString()
+  @ApiProperty()
+  public pass: string
+}
+
 export class AccountsMetadataSmtpV1 {
   @IsString()
   @ApiProperty()
@@ -110,18 +120,26 @@ export class AccountsMetadataSmtpV1 {
   @ApiProperty()
   public port?: number = 25
 
+  @IsString()
+  @IsOptional()
+  @ApiProperty()
+  public from?: string
+
   @IsBoolean()
   @IsOptional()
   @ApiProperty()
-  public tls: boolean = false
+  public ignoreTLS: boolean = false
 
-  @IsString()
+  @IsBoolean()
+  @IsOptional()
   @ApiProperty()
-  public username: string
+  public secure: boolean = true
 
-  @IsString()
+  @ValidateNested()
+  @IsOptional()
+  @Type(() => AccountsMetadataSmtpAuthV1)
   @ApiProperty()
-  public password: string
+  public auth?: AccountsMetadataSmtpAuthV1
 
   // noinspection JSUnusedGlobalSymbols
   public toJSON() {
@@ -228,7 +246,7 @@ export class AccountsMetadataV1 {
   public webhooks?: AccountsMetadataWebhooksV1[]
 }
 
-export default async function setupAccounts(): Promise<any[]> {
+export default async function setupAccounts(): Promise<AccountsMetadataV1[]> {
   try {
     if (existsSync(ACCOUNTS_FILE_PATH)) {
       Logger.verbose('Account file found, validating...', 'setupAccounts')
@@ -240,7 +258,7 @@ export default async function setupAccounts(): Promise<any[]> {
   }
 }
 
-export async function validateAccounts(): Promise<any[]> {
+export async function validateAccounts(): Promise<AccountsMetadataV1[]> {
   const data = readFileSync(ACCOUNTS_FILE_PATH, 'utf8')
   const yml = parse(data)
   const schema = plainToInstance(AccountsFileV1, yml)

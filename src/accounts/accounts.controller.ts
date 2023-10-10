@@ -1,4 +1,17 @@
-import { Body, Controller, Delete, Get, HttpStatus, Logger, Param, Patch, Post, Res, Sse } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpStatus,
+  Logger,
+  Param, ParseFilePipe,
+  Patch,
+  Post,
+  Res,
+  Sse, UploadedFiles,
+  UseInterceptors,
+} from '@nestjs/common'
 import { ModuleRef } from '@nestjs/core'
 import { Response } from 'express'
 import { AbstractController } from '~/_common/abstracts/abstract.controller'
@@ -15,6 +28,8 @@ import { ApiReadResponseDecorator } from '~/_common/decorators/api-read-response
 import { ApiUpdateDecorator } from '~/_common/decorators/api-update.decorator'
 import { ApiDeletedResponseDecorator } from '~/_common/decorators/api-deleted-response.decorator'
 import { ApiTags } from '@nestjs/swagger'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { AccountSubmitDto } from '~/accounts/_dto/account-submit.dto'
 
 @ApiTags('accounts')
 @Controller('accounts')
@@ -90,6 +105,27 @@ export class AccountsController extends AbstractController {
   @ApiDeletedResponseDecorator(AccountsMetadataV1)
   public async delete(@Res() res: Response, @Param('account') id: string): Promise<Response> {
     const data = await this.service.delete(id)
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      data,
+    })
+  }
+
+  @Post(':account([\\w-.]+)/submit')
+  @UseInterceptors(FileInterceptor('file'))
+  @UseRoles({
+    resource: ScopesEnum.Accounts,
+    action: ActionEnum.Create,
+  })
+  public async submit(
+    @Res() res: Response,
+    @Param('account') id: string,
+    @Body() body: AccountSubmitDto,
+    @UploadedFiles(
+      new ParseFilePipe({ fileIsRequired: false }),
+    ) files?: Array<Express.Multer.File>,
+  ): Promise<Response> {
+    const data = await this.service.submit(id, body, files)
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
       data,

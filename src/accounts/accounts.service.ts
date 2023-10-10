@@ -6,6 +6,8 @@ import { AbstractService } from '~/_common/abstracts/abstract.service'
 import { InjectImapflow } from '~/imapflow/imapflow.decorators'
 import { AccountsFileV1, AccountsMetadataV1, readAccountsFile, writeAccountsFile } from './accounts.setup'
 import { PartialType } from '@nestjs/swagger'
+import { MailerService } from '@nestjs-modules/mailer'
+import { AccountSubmitDto } from '~/accounts/_dto/account-submit.dto'
 
 class InternalAccountMetadataV1 extends PartialType(AccountsMetadataV1) {
 }
@@ -18,6 +20,7 @@ export class AccountsService extends AbstractService {
   public constructor(
     protected readonly moduleRef: ModuleRef,
     @InjectImapflow() protected imapflow: Map<string, ImapFlow>,
+    private readonly mailerService: MailerService,
   ) {
     super({ moduleRef })
     // noinspection JSUnusedGlobalSymbols
@@ -72,5 +75,17 @@ export class AccountsService extends AbstractService {
     accounts.accounts = accounts.accounts.filter((a) => a.id !== id)
     await writeAccountsFile(accounts, this.cache)
     return account
+  }
+
+  public async submit(id: string, body: AccountSubmitDto, files?: Express.Multer.File[]) {
+    const accounts = await readAccountsFile(this.cache)
+    const account = accounts.accounts.find((a) => a.id === id)
+    if (!account) throw new NotFoundException(`Account not found: ${id}`)
+    return this.mailerService.sendMail({
+      ...body,
+      attachments: files,
+      from: account.smtp.from || account.smtp.auth.user,
+      transporterName: id,
+    })
   }
 }
