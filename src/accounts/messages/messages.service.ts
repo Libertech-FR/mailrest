@@ -49,18 +49,21 @@ export class MessagesService extends AbstractService {
     try {
       lock = await flow.getMailboxLock(mailbox)
     } catch (e) {
-      throw new NotFoundException(`Mailbox ${mailbox} not found`)
+      throw new NotFoundException(`Mailbox ${mailbox} not found`, e)
     }
     try {
       await flow.mailboxOpen(mailbox)
-      const listMessages = await flow.search({ seq: '1:*' })
+      const listMessages = await flow.search({ seq: '1:*', deleted: false })
       total = listMessages.length
       const seq = [options.skip + 1, options.limit !== -1 ? options.skip + options.limit : '*'].join(':')
-      const messages = flow.fetch(seq, {
-        flags: true,
-        envelope: true,
-        uid: true,
-      })
+      const messages = flow.fetch(
+        { seq, deleted: false },
+        {
+          flags: true,
+          envelope: true,
+          uid: true,
+        },
+      )
       for await (const message of messages) {
         data.push(omit(message, ['modseq']))
       }
@@ -72,7 +75,7 @@ export class MessagesService extends AbstractService {
 
   public async read(
     account: string,
-    uid: string,
+    seq: string,
     options?: {
       mailbox?: string
       query?: FetchQueryObject
@@ -90,7 +93,7 @@ export class MessagesService extends AbstractService {
     }
     try {
       const message = await flow.fetchOne(
-        uid,
+        seq,
         options?.query || {
           flags: true,
           envelope: true,
@@ -107,13 +110,13 @@ export class MessagesService extends AbstractService {
 
   public async readSource(
     account: string,
-    uid: string,
+    seq: string,
     options?: {
       mailbox?: string
     },
   ): Promise<Partial<FetchMessageObject>> {
     const mailbox = options?.mailbox || 'INBOX'
-    return this.read(account, uid, {
+    return this.read(account, seq, {
       mailbox,
       query: {
         source: true,
@@ -124,7 +127,7 @@ export class MessagesService extends AbstractService {
 
   public async delete(
     account: string,
-    uid: string,
+    seq: string,
     options?: {
       mailbox?: string
     },
@@ -139,7 +142,7 @@ export class MessagesService extends AbstractService {
       throw new NotFoundException(`Mailbox ${mailbox} not found`)
     }
     try {
-      return await flow.messageDelete(uid)
+      return await flow.messageDelete(seq)
     } finally {
       lock.release()
     }

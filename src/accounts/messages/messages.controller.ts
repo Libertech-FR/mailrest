@@ -40,7 +40,7 @@ export class MessagesController extends AbstractController {
     })
   }
 
-  @Get(':message([\\w-.]+)')
+  @Get(':seq([\\w-.]+)')
   @UseRoles({
     resource: ScopesEnum.Accounts,
     action: ActionEnum.Read,
@@ -50,10 +50,10 @@ export class MessagesController extends AbstractController {
   public async read(
     @Res() res: Response,
     @Param('account') account: string,
-    @Param('message') message: string,
+    @Param('seq') seq: string,
     @Query('mailbox') mailbox?: string,
   ): Promise<Response> {
-    const data = await this.service.read(account, message, {
+    const data = await this.service.read(account, seq, {
       mailbox,
     })
     return res.json({
@@ -62,7 +62,7 @@ export class MessagesController extends AbstractController {
     })
   }
 
-  @Get(':message([\\w-.]+)/source')
+  @Get(':seq([\\w-.]+)/source')
   @UseRoles({
     resource: ScopesEnum.Accounts,
     action: ActionEnum.Read,
@@ -78,16 +78,16 @@ export class MessagesController extends AbstractController {
   public async source(
     @Res() res: Response,
     @Param('account') account: string,
-    @Param('message') message: string,
+    @Param('seq') seq: string,
     @Query('mailbox') mailbox?: string,
   ): Promise<void> {
-    const eml = await this.service.readSource(account, message, {
+    const eml = await this.service.readSource(account, seq, {
       mailbox,
     })
     Readable.from(eml.source).pipe(res)
   }
 
-  @Delete(':message([\\w-.]+)')
+  @Delete(':seq([\\w-.]+)')
   @UseRoles({
     resource: ScopesEnum.Accounts,
     action: ActionEnum.Delete,
@@ -109,10 +109,10 @@ export class MessagesController extends AbstractController {
   public async delete(
     @Res() res: Response,
     @Param('account') account: string,
-    @Param('message') message: string,
+    @Param('seq') seq: string,
     @Query('mailbox') mailbox: string,
   ): Promise<Response> {
-    const deleted = await this.service.delete(account, message, {
+    const deleted = await this.service.delete(account, seq, {
       mailbox,
     })
     return res.json({
