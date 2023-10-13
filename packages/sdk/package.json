@@ -1,0 +1,37 @@
+{
+  "name": "@libertech-fr/mailrest-sdk",
+  "version": "0.0.3",
+  "description": "SDK package for MailRest API",
+  "contributors": [
+    {
+      "name": "Libertech",
+      "email": "contact@libertech.fr",
+      "url": "https://libertech.fr"
+    },
+    {
+      "name": "RICHARD-Quentin",
+      "email": "richard.quentin88@gmail.com",
+      "url": "https://github.com/RICHARD-Quentin"
+    },
+    {
+      "name": " tacxou",
+      "email": "12997062+tacxou@users.noreply.github.com",
+      "url": "https://github.com/tacxou"
+    }
+  ],
+  "license": "MIT",
+  "main": "dist/index.ts",
+  "scripts": {
+    "prebuild": "rimraf dist && npm run generate",
+    "build": "tsc --build tsconfig.json",
+    "generate": "openapi-typescript ./assets/swagger.json -o ./src/mailrest-api.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "openapi-typescript": "^6.7.0",
+    "typescript": "^5.2.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

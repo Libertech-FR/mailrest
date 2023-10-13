@@ -3,7 +3,11 @@ import { NestExpressApplication } from '@nestjs/platform-express'
 import { DocumentBuilder, SwaggerCustomOptions, SwaggerModule } from '@nestjs/swagger'
 import { Request, Response } from 'express'
 import { SwaggerTheme } from 'swagger-themes'
-import { readFileSync } from 'fs'
+import { readFileSync, writeFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+import { Logger } from '@nestjs/common'
+
+export const SWAGGER_TMP_FILE_PATH = resolve('./packages/sdk/assets/swagger.json')
 
 export default function (app: NestExpressApplication) {
   const config = app.get<ConfigService>(ConfigService)
@@ -23,5 +27,7 @@ export default function (app: NestExpressApplication) {
     swaggerOptions: {},
     customCss: theme.getBuffer('dark'),
   })
+  Logger.debug(`Writing swagger.json to disk... <${SWAGGER_TMP_FILE_PATH}>`)
+  writeFileSync(SWAGGER_TMP_FILE_PATH, JSON.stringify(document, null, 2))
   app.getHttpAdapter().get(config.get<string>('swagger.api'), (req: Request, res: Response) => res.json(document))
 }

@@ -1,4 +1,8 @@
 node_modules/
+documentation/
+samples/
+packages/
+templates/
 dist/
 .DS_Store/
 .idea/

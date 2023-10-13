@@ -1,0 +1,1506 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "AppController_getInfo",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/accounts": {
+      "get": {
+        "operationId": "AccountsController_search",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PaginatedResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "statusCode": {
+                          "type": "number",
+                          "enum": [
+                            200
+                          ]
+                        },
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/AccountsMetadataV1"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "accounts"
+        ]
+      },
+      "post": {
+        "operationId": "AccountsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountsMetadataV1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "statusCode": {
+                      "type": "number",
+                      "enum": [
+                        201
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AccountsMetadataV1"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Schema validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchemaDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "accounts"
+        ]
+      }
+    },
+    "/accounts/{account}": {
+      "get": {
+        "operationId": "AccountsController_read",
+        "parameters": [
+          {
+            "name": "account",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "statusCode": {
+                      "type": "number",
+                      "enum": [
+                        200
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AccountsMetadataV1"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "accounts"
+        ]
+      },
+      "patch": {
+        "operationId": "AccountsController_update",
+        "parameters": [
+          {
+            "name": "account",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountsMetadataV1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "statusCode": {
+                      "type": "number",
+                      "enum": [
+                        200
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AccountsMetadataV1"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Schema validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchemaDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "accounts"
+        ]
+      },
+      "delete": {
+        "operationId": "AccountsController_delete",
+        "parameters": [
+          {
+            "name": "account",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "statusCode": {
+                      "type": "number",
+                      "enum": [
+                        200
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AccountsMetadataV1"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "accounts"
+        ]
+      }
+    },
+    "/accounts/{account}/submit": {
+      "post": {
+        "operationId": "AccountsController_submit",
+        "parameters": [
+          {
+            "name": "account",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountSubmitDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "accounts"
+        ]
+      }
+    },
+    "/accounts/changes": {
+      "get": {
+        "operationId": "AccountsController_sse",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "accounts"
+        ]
+      }
+    },
+    "/accounts/{account}/mailboxes": {
+      "get": {
+        "operationId": "MailboxesController_search",
+        "parameters": [
+          {
+            "name": "account",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PaginatedResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "statusCode": {
+                          "type": "number",
+                          "enum": [
+                            200
+                          ]
+                        },
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/ListTreeDto"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "mailboxes"
+        ]
+      }
+    },
+    "/accounts/{account}/messages": {
+      "get": {
+        "operationId": "MessagesController_search",
+        "parameters": [
+          {
+            "name": "account",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mailbox",
+            "required": false,
+            "in": "query",
+            "schema": {}
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PaginatedResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "statusCode": {
+                          "type": "number",
+                          "enum": [
+                            200
+                          ]
+                        },
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/MessagesSearchQueryDto"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "messages"
+        ]
+      }
+    },
+    "/accounts/{account}/messages/{seq}": {
+      "get": {
+        "operationId": "MessagesController_read",
+        "parameters": [
+          {
+            "name": "account",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "seq",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mailbox",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "statusCode": {
+                      "type": "number",
+                      "enum": [
+                        200
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/FetchMessageDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "messages"
+        ]
+      },
+      "delete": {
+        "operationId": "MessagesController_delete",
+        "parameters": [
+          {
+            "name": "account",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "seq",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mailbox",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "statusCode": {
+                      "type": "number",
+                      "enum": [
+                        200
+                      ]
+                    },
+                    "deleted": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "messages"
+        ]
+      }
+    },
+    "/accounts/{account}/messages/{seq}/source": {
+      "get": {
+        "operationId": "MessagesController_source",
+        "parameters": [
+          {
+            "name": "account",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "seq",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mailbox",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The source of the message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "messages"
+        ]
+      }
+    },
+    "/auth/info": {
+      "get": {
+        "operationId": "AuthController_info",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "statusCode": {
+                      "type": "number",
+                      "enum": [
+                        200
+                      ]
+                    },
+                    "user": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/cron/run": {
+      "get": {
+        "operationId": "CronController_runAll",
+        "parameters": [
+          {
+            "name": "seq",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mailbox",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sync",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "delete",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/cron/run/{account}": {
+      "get": {
+        "operationId": "CronController_runAccount",
+        "parameters": [
+          {
+            "name": "account",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "seq",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mailbox",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sync",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "delete",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/tokens": {
+      "post": {
+        "operationId": "TokensController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InternalTokensMetadataV1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "statusCode": {
+                      "type": "number",
+                      "enum": [
+                        201
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/InternalTokensMetadataV1"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Schema validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchemaDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "tokens"
+        ]
+      }
+    },
+    "/tokens/{token}": {
+      "delete": {
+        "operationId": "TokensController_delete",
+        "parameters": [
+          {
+            "name": "token",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "statusCode": {
+                      "type": "number",
+                      "enum": [
+                        200
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/InternalTokensMetadataV1"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "tokens"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "@libertech-fr/mailrest",
+    "description": "An email retrieval system with a REST API built with NestJS in NodeJS",
+    "version": "0.0.3",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "basic": {
+        "type": "http",
+        "scheme": "basic"
+      },
+      "access-token": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "PaginatedFilterDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "AccountsMetadataImapAuthV1": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "string"
+          },
+          "pass": {
+            "type": "string"
+          },
+          "accessToken": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "user",
+          "pass",
+          "accessToken"
+        ]
+      },
+      "AccountsMetadataImapV1": {
+        "type": "object",
+        "properties": {
+          "host": {
+            "type": "string"
+          },
+          "port": {
+            "type": "number"
+          },
+          "auth": {
+            "$ref": "#/components/schemas/AccountsMetadataImapAuthV1"
+          },
+          "secure": {
+            "type": "boolean"
+          },
+          "servername": {
+            "type": "string"
+          },
+          "disableCompression": {
+            "type": "boolean"
+          },
+          "tls": {
+            "type": "object"
+          },
+          "maxIdleTime": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "host",
+          "port",
+          "auth",
+          "secure",
+          "servername",
+          "disableCompression",
+          "tls",
+          "maxIdleTime"
+        ]
+      },
+      "AccountsMetadataSmtpAuthV1": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "string"
+          },
+          "pass": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "user",
+          "pass"
+        ]
+      },
+      "AccountsMetadataSmtpV1": {
+        "type": "object",
+        "properties": {
+          "host": {
+            "type": "string"
+          },
+          "port": {
+            "type": "number"
+          },
+          "from": {
+            "type": "string"
+          },
+          "ignoreTLS": {
+            "type": "boolean"
+          },
+          "secure": {
+            "type": "boolean"
+          },
+          "auth": {
+            "$ref": "#/components/schemas/AccountsMetadataSmtpAuthV1"
+          }
+        },
+        "required": [
+          "host",
+          "port",
+          "from",
+          "ignoreTLS",
+          "secure",
+          "auth"
+        ]
+      },
+      "AccountsMetadataWebhooksCronV1": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "pattern": {
+            "type": "string"
+          },
+          "seq": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "enabled",
+          "pattern",
+          "seq"
+        ]
+      },
+      "AccountsMetadataWebhooksV1": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "url": {
+            "type": "string"
+          },
+          "secret": {
+            "type": "string"
+          },
+          "cron": {
+            "$ref": "#/components/schemas/AccountsMetadataWebhooksCronV1"
+          },
+          "alg": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "enabled",
+          "url",
+          "secret",
+          "cron",
+          "alg"
+        ]
+      },
+      "AccountsMetadataV1": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "imap": {
+            "$ref": "#/components/schemas/AccountsMetadataImapV1"
+          },
+          "smtp": {
+            "$ref": "#/components/schemas/AccountsMetadataSmtpV1"
+          },
+          "webhooks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccountsMetadataWebhooksV1"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "imap",
+          "smtp",
+          "webhooks"
+        ]
+      },
+      "PaginatedResponseDto": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "number",
+            "enum": [
+              200
+            ]
+          },
+          "total": {
+            "type": "number"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "statusCode",
+          "total",
+          "data"
+        ]
+      },
+      "ErrorSchemaDto": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "number",
+            "enum": [
+              400
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "validations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "_exception": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "statusCode",
+          "message",
+          "validations",
+          "_exception"
+        ]
+      },
+      "NotFoundDto": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "number",
+            "enum": [
+              404
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "statusCode",
+          "message"
+        ]
+      },
+      "AccountSubmitDto": {
+        "type": "object",
+        "properties": {
+          "to": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cc": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bcc": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "replyTo": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "inReplyTo": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "html": {
+            "type": "string"
+          },
+          "raw": {
+            "type": "string"
+          },
+          "textEncoding": {
+            "type": "string",
+            "enum": [
+              "quoted-printable",
+              "base64"
+            ]
+          },
+          "date": {
+            "type": "string"
+          },
+          "references": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "encoding": {
+            "type": "string"
+          },
+          "headers": {
+            "type": "object"
+          },
+          "context": {
+            "type": "object"
+          },
+          "template": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "to",
+          "cc",
+          "bcc",
+          "replyTo",
+          "inReplyTo",
+          "subject",
+          "text",
+          "html",
+          "raw",
+          "textEncoding",
+          "date",
+          "references",
+          "encoding",
+          "headers",
+          "context",
+          "template"
+        ]
+      },
+      "ListTreeDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "flags": {
+            "type": "object"
+          },
+          "path": {
+            "type": "string"
+          },
+          "subscribed": {
+            "type": "boolean"
+          },
+          "listed": {
+            "type": "boolean"
+          },
+          "delimiter": {
+            "type": "string"
+          },
+          "specialUse": {
+            "type": "string"
+          },
+          "folders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ListTreeDto"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "flags",
+          "path",
+          "subscribed",
+          "listed",
+          "delimiter",
+          "specialUse",
+          "folders"
+        ]
+      },
+      "MessagesSearchQueryDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "Set": {
+        "type": "object",
+        "properties": {}
+      },
+      "Rfc822Dto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "address"
+        ]
+      },
+      "EnvelopeContentDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "from": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Rfc822Dto"
+            }
+          },
+          "sender": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Rfc822Dto"
+            }
+          },
+          "replyTo": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Rfc822Dto"
+            }
+          },
+          "to": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Rfc822Dto"
+            }
+          },
+          "inReplyTo": {
+            "type": "string"
+          },
+          "messageId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "date",
+          "subject",
+          "from",
+          "sender",
+          "replyTo",
+          "to",
+          "inReplyTo",
+          "messageId"
+        ]
+      },
+      "ChildNodeDto": {
+        "type": "object",
+        "properties": {
+          "part": {
+            "type": "string"
+          },
+          "childNodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChildNodeDto"
+            }
+          },
+          "type": {
+            "type": "string"
+          },
+          "parameters": {
+            "type": "object"
+          },
+          "encoding": {
+            "type": "string"
+          },
+          "size": {
+            "type": "number"
+          },
+          "envelope": {
+            "$ref": "#/components/schemas/EnvelopeContentDto"
+          },
+          "lineCount": {
+            "type": "number"
+          },
+          "language": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "disposition": {
+            "type": "string"
+          },
+          "dispositionParameters": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "part",
+          "childNodes",
+          "type",
+          "parameters",
+          "encoding",
+          "size",
+          "envelope",
+          "lineCount",
+          "language",
+          "disposition",
+          "dispositionParameters"
+        ]
+      },
+      "BodyStructureDto": {
+        "type": "object",
+        "properties": {
+          "childNodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChildNodeDto"
+            }
+          },
+          "type": {
+            "type": "string"
+          },
+          "parameters": {
+            "type": "object"
+          },
+          "language": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "childNodes",
+          "type",
+          "parameters",
+          "language"
+        ]
+      },
+      "FetchMessageDto": {
+        "type": "object",
+        "properties": {
+          "seq": {
+            "type": "number"
+          },
+          "flags": {
+            "$ref": "#/components/schemas/Set"
+          },
+          "uid": {
+            "type": "number"
+          },
+          "envelope": {
+            "$ref": "#/components/schemas/EnvelopeContentDto"
+          },
+          "bodyStructure": {
+            "$ref": "#/components/schemas/BodyStructureDto"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "seq",
+          "flags",
+          "uid",
+          "envelope",
+          "bodyStructure",
+          "id"
+        ]
+      },
+      "TokensMetadataAclsV1": {
+        "type": "object",
+        "properties": {
+          "resource": {
+            "type": "string"
+          },
+          "actions": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "required": [
+          "resource",
+          "actions"
+        ]
+      },
+      "InternalTokensMetadataV1": {
+        "type": "object",
+        "properties": {
+          "client_id": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "ip": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "acls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TokensMetadataAclsV1"
+            }
+          }
+        }
+      }
+    }
+  }
+}
