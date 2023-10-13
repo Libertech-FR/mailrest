@@ -16,5 +16,5 @@
 ## Support
 Mailrest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please read more here. For personalized support, please contact **Libertech SARL**.
 ## License
-Teaket is [MIT licensed](LICENSE).
+Mailrest is [MIT licensed](LICENSE).
 If you require a license specific to your needs, please contact **Libertech SARL**.
