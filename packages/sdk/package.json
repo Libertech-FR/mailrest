@@ -20,7 +20,7 @@
     }
   ],
   "license": "MIT",
-  "main": "dist/index.ts",
+  "main": "dist/index.js",
   "scripts": {
     "prebuild": "rimraf dist && npm run generate",
     "build": "tsc --build tsconfig.json",
