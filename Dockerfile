@@ -39,6 +39,6 @@ RUN yarn install \
 
 COPY --from=builder /usr/src/app/dist ./dist
 
-EXPOSE 7000
+EXPOSE 7200
 
 CMD ["yarn", "start:prod"]
