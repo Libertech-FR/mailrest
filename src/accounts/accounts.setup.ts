@@ -1,16 +1,16 @@
 import { Logger } from '@nestjs/common'
 import { instanceToInstance, plainToInstance, Type } from 'class-transformer'
 import { IsBoolean, IsEnum, IsInt, IsObject, IsOptional, IsString, Max, Min, Validate, ValidateNested, validateOrReject } from 'class-validator'
-import { existsSync, readFileSync } from 'fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { readFile, writeFile } from 'fs/promises'
 import { ImapFlowOptions } from 'imapflow'
 import { LRUCache } from 'lru-cache'
-import { dirname, join } from 'path'
+import { resolve } from 'node:path'
 import { parse, stringify } from 'yaml'
 import { UniqueFieldValidator } from '~/_common/validators/unique.field.validator'
 import { ApiProperty } from '@nestjs/swagger'
 
-export const ACCOUNTS_FILE_PATH = join(dirname(dirname(dirname(__dirname))), '/config/accounts.yml') // TODO: change dirname
+export const ACCOUNTS_FILE_PATH = resolve('./config/accounts.yml')
 
 export class AccountsFileV1 {
   @IsEnum(['1'])

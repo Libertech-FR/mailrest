@@ -1,16 +1,16 @@
 import { Logger } from '@nestjs/common'
 import { instanceToInstance, plainToInstance, Type } from 'class-transformer'
 import { IsArray, IsEnum, IsIP, IsNotEmpty, IsOptional, IsString, MinLength, Validate, ValidateNested, validateOrReject } from 'class-validator'
-import { existsSync, readFileSync } from 'fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { readFile, writeFile } from 'fs/promises'
 import { LRUCache } from 'lru-cache'
-import { dirname, join } from 'path'
 import { parse, stringify } from 'yaml'
 import { UniqueFieldValidator } from '~/_common/validators/unique.field.validator'
 import { IsType } from '~/_common/decorators/is-type.decorator'
 import { ApiProperty } from '@nestjs/swagger'
+import { resolve } from 'node:path'
 
-export const TOKENS_FILE_PATH = join(dirname(dirname(dirname(__dirname))), '/config/tokens.yml') // TODO: change dirname
+export const TOKENS_FILE_PATH = resolve('./config/tokens.yml')
 
 export class TokensFileV1 {
   @IsEnum(['1'])

@@ -13,6 +13,7 @@ import 'multer'
 
 declare const module: any
 ;(async (): Promise<void> => {
+  console.log('Starting mailrest...')
   const config = await configInstance()
   const app = await NestFactory.create<NestExpressApplication & INestApplication>(AppModule, {
     logger: config.application.logger,

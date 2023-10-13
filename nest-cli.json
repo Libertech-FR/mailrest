@@ -13,6 +13,8 @@
         "exclude": "**/*.js"
       }
     ],
+    "builder": "swc",
+    "typeCheck": true,
     "watchAssets": true
   }
 }
