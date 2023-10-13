@@ -89,7 +89,7 @@ export class MessagesService extends AbstractService {
     try {
       lock = await flow.getMailboxLock(mailbox)
     } catch (e) {
-      throw new NotFoundException(`Mailbox ${mailbox} not found`)
+      throw new NotFoundException(`Mailbox ${mailbox} not found`, e)
     }
     try {
       const message = await flow.fetchOne(
