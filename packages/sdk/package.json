@@ -1,6 +1,6 @@
 {
   "name": "@libertech-fr/mailrest-sdk",
-  "version": "0.0.3",
+  "version": "0.0.10",
   "description": "SDK package for MailRest API",
   "contributors": [
     {
@@ -24,10 +24,12 @@
   "scripts": {
     "prebuild": "rimraf dist && npm run generate",
     "build": "tsc --build tsconfig.json",
+    "postbuild": "cpr README.md dist/README.md && cpr LICENSE dist/LICENSE && cpr package.json dist/package.json",
     "generate": "openapi-typescript ./assets/swagger.json -o ./src/mailrest-api.ts"
   },
   "devDependencies": {
     "@types/node": "^18.0.0",
+    "cpr": "^3.0.1",
     "openapi-typescript": "^6.7.0",
     "rimraf": "^5.0.5",
     "typescript": "^5.2.2"
