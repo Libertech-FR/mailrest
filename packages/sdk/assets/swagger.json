@@ -855,7 +855,7 @@
   "info": {
     "title": "@libertech-fr/mailrest",
     "description": "An email retrieval system with a REST API built with NestJS in NodeJS",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "contact": {}
   },
   "tags": [],
