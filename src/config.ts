@@ -6,7 +6,7 @@ import { IAuthModuleOptions } from '@nestjs/passport'
 import { BinaryLike, CipherCCMTypes, CipherGCMTypes, CipherKey, createHash } from 'crypto'
 import { SwaggerCustomOptions } from '@nestjs/swagger'
 import setupAccounts, { AccountsMetadataV1 } from './accounts/accounts.setup'
-import setupTokens, { TokensMetadataV1 } from "~/tokens/tokens.setup";
+import setupTokens, { TokensMetadataV1 } from '~/tokens/tokens.setup'
 import { MailerOptions } from '@nestjs-modules/mailer'
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter'
 
@@ -49,14 +49,14 @@ export default async (): Promise<ConfigInstance> => {
   const tokens = await setupTokens()
   return {
     application: {
-      logger: process.env.LOGGER
-        ? (process.env.LOGGER.split(',') as LogLevel[])
-        : process.env.NODE_ENV === 'development'
+      logger: process.env['MR_LOGGER']
+        ? (process.env['MR_LOGGER'].split(',') as LogLevel[])
+        : process.env['NODE_ENV'] === 'development'
         ? ['error', 'warn', 'log', 'debug']
         : ['error', 'warn', 'log'],
     },
     ioredis: {
-      uri: process.env.IOREDIS_URL,
+      uri: process.env['MR_IOREDIS_URL'],
       options: {
         showFriendlyErrorStack: true,
       },
@@ -84,15 +84,15 @@ export default async (): Promise<ConfigInstance> => {
     },
     jwt: {
       options: {
-        secret: process.env.JWT_SECRET,
+        secret: process.env['MR_JWT_SECRET'],
       },
     },
     crypt: {
       algorithm: 'aes-256-cbc',
-      securityKey: process.env.CRYPT_SECURITYKEY
-        ? createHash('sha256').update(String(process.env.CRYPT_SECURITYKEY)).digest('base64').substring(0, 32)
+      securityKey: process.env['MR_CRYPT_SECURITYKEY']
+        ? createHash('sha256').update(String(process.env['MR_CRYPT_SECURITYKEY'])).digest('base64').substring(0, 32)
         : null,
-      initVector: createHash('md5').update(String(process.env.CRYPT_SECURITYKEY)).digest('hex').substring(0, 16),
+      initVector: createHash('md5').update(String(process.env['MR_CRYPT_SECURITYKEY'])).digest('hex').substring(0, 16),
     },
     passport: {
       options: {
