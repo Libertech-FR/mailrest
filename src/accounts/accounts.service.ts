@@ -1,4 +1,13 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common'
+import {
+  BadGatewayException,
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+  ServiceUnavailableException,
+} from '@nestjs/common'
 import { ModuleRef } from '@nestjs/core'
 import { ImapFlow } from 'imapflow'
 import { LRUCache } from 'lru-cache'
@@ -8,9 +17,11 @@ import { AccountsFileV1, AccountsMetadataV1, readAccountsFile, writeAccountsFile
 import { PartialType } from '@nestjs/swagger'
 import { MailerService } from '@nestjs-modules/mailer'
 import { AccountSubmitDto } from '~/accounts/_dto/account-submit.dto'
+import { AccountSubmitedDto } from '~/accounts/_dto/account-submited.dto'
+import os from 'os'
+import gateway from 'default-gateway'
 
-class InternalAccountMetadataV1 extends PartialType(AccountsMetadataV1) {
-}
+class InternalAccountMetadataV1 extends PartialType(AccountsMetadataV1) {}
 
 @Injectable()
 export class AccountsService extends AbstractService {
@@ -77,15 +88,38 @@ export class AccountsService extends AbstractService {
     return account
   }
 
-  public async submit(id: string, body: AccountSubmitDto, files?: Express.Multer.File[]) {
+  public async submit(id: string, body: AccountSubmitDto, files?: Express.Multer.File[]): Promise<AccountSubmitedDto> {
     const accounts = await readAccountsFile(this.cache)
     const account = accounts.accounts.find((a) => a.id === id)
     if (!account) throw new NotFoundException(`Account not found: ${id}`)
-    return this.mailerService.sendMail({
-      ...body,
-      attachments: files,
-      from: account.smtp.from || account.smtp.auth.user,
-      transporterName: id,
-    })
+    if (!body.template && (!body.text || !body.html)) {
+      throw new BadRequestException(`Template, text or html is required !`)
+    }
+    try {
+      return await this.mailerService.sendMail({
+        ...body,
+        attachments: files.map((file) => ({
+          filename: file.originalname,
+          content: file.buffer,
+        })),
+        from:
+          account.smtp.from ||
+          account.smtp?.auth?.user ||
+          (await (async () => {
+            return `${os.hostname()}@${(await gateway.v4()).gateway}`
+          })()),
+        transporterName: id,
+      })
+    } catch (e) {
+      if (!e.code) throw new BadRequestException(`Failed to post message with <${e.message}>`, e.stack)
+      switch (e.code) {
+        case 'EDNS':
+          throw new BadGatewayException(`[${e.code}] SMTP server connexion failed with <${e.message}>`, e.stack)
+        case 'ESOCKET':
+          throw new ServiceUnavailableException(`[${e.code}] SMTP server connexion failed with <${e.message}>`, e.stack)
+        default:
+          throw new InternalServerErrorException(`[${e.code}] SMTP connection attempt internal server error with <${e.message}>`, e.stack)
+      }
+    }
   }
 }

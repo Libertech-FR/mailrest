@@ -74,8 +74,8 @@ export class AccountSubmitDto {
     [name: string]: any
   }
 
-  @IsString()
   @IsOptional()
+  @IsObject()
   @ApiProperty()
   public context?: {
     [name: string]: any

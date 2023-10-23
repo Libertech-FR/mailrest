@@ -74,7 +74,7 @@ export default async (): Promise<ConfigInstance> => {
           from: '"nest-modules" <modules@nestjs.com>',
         },
         template: {
-          dir: __dirname + '/../../templates',
+          dir: __dirname + '/../templates',
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true,

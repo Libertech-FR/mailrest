@@ -5,11 +5,13 @@ import {
   Get,
   HttpStatus,
   Logger,
-  Param, ParseFilePipe,
+  Param,
+  ParseFilePipe,
   Patch,
   Post,
   Res,
-  Sse, UploadedFiles,
+  Sse,
+  UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common'
 import { ModuleRef } from '@nestjs/core'
@@ -28,7 +30,7 @@ import { ApiReadResponseDecorator } from '~/_common/decorators/api-read-response
 import { ApiUpdateDecorator } from '~/_common/decorators/api-update.decorator'
 import { ApiDeletedResponseDecorator } from '~/_common/decorators/api-deleted-response.decorator'
 import { ApiTags } from '@nestjs/swagger'
-import { FileInterceptor } from '@nestjs/platform-express'
+import { FilesInterceptor } from '@nestjs/platform-express'
 import { AccountSubmitDto } from '~/accounts/_dto/account-submit.dto'
 
 @ApiTags('accounts')
@@ -112,7 +114,7 @@ export class AccountsController extends AbstractController {
   }
 
   @Post(':account([\\w-.]+)/submit')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FilesInterceptor('files'))
   @UseRoles({
     resource: ScopesEnum.Accounts,
     action: ActionEnum.Create,
@@ -121,9 +123,7 @@ export class AccountsController extends AbstractController {
     @Res() res: Response,
     @Param('account') id: string,
     @Body() body: AccountSubmitDto,
-    @UploadedFiles(
-      new ParseFilePipe({ fileIsRequired: false }),
-    ) files?: Array<Express.Multer.File>,
+    @UploadedFiles(new ParseFilePipe({ fileIsRequired: false })) files?: Array<Express.Multer.File>,
   ): Promise<Response> {
     const data = await this.service.submit(id, body, files)
     return res.status(HttpStatus.OK).json({

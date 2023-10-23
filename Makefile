@@ -38,12 +38,16 @@ generate:
 	@docker exec -it $(APPNAME) yarn generate
 
 dbs:
-	@docker volume create $(APPNAME)-redis
-	@docker run -d --rm \
-		--name $(APPNAME)-redis \
-		--network dev \
-		-p 6379:6379 \
-		redis
+	@docker run --rm -d \
+		-p 1080:1080 \
+		-p 1025:1025 \
+		maildev/maildev
+#	@docker volume create $(APPNAME)-redis
+#	@docker run -d --rm \
+#		--name $(APPNAME)-redis \
+#		--network dev \
+#		-p 6379:6379 \
+#		redis
 
 stop:
 	@docker stop $(APPNAME) || true
