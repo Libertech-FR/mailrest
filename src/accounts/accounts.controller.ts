@@ -32,6 +32,7 @@ import { ApiDeletedResponseDecorator } from '~/_common/decorators/api-deleted-re
 import { ApiTags } from '@nestjs/swagger'
 import { FilesInterceptor } from '@nestjs/platform-express'
 import { AccountSubmitDto } from '~/accounts/_dto/account-submit.dto'
+import { AccountSubmitedDto } from '~/accounts/_dto/account-submited.dto'
 
 @ApiTags('accounts')
 @Controller('accounts')
@@ -119,6 +120,7 @@ export class AccountsController extends AbstractController {
     resource: ScopesEnum.Accounts,
     action: ActionEnum.Create,
   })
+  @ApiDeletedResponseDecorator(AccountSubmitedDto)
   public async submit(
     @Res() res: Response,
     @Param('account') id: string,

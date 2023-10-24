@@ -292,8 +292,35 @@
           }
         },
         "responses": {
-          "201": {
-            "description": ""
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "statusCode": {
+                      "type": "number",
+                      "enum": [
+                        200
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AccountSubmitedDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -1131,6 +1158,58 @@
         "required": [
           "statusCode",
           "message"
+        ]
+      },
+      "AccountSubmitedDto": {
+        "type": "object",
+        "properties": {
+          "accepted": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "rejected": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ehlo": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "envelopeTime": {
+            "type": "number"
+          },
+          "messageTime": {
+            "type": "number"
+          },
+          "messageSize": {
+            "type": "number"
+          },
+          "response": {
+            "type": "string"
+          },
+          "envelope": {
+            "type": "object"
+          },
+          "messageId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "accepted",
+          "rejected",
+          "ehlo",
+          "envelopeTime",
+          "messageTime",
+          "messageSize",
+          "response",
+          "envelope",
+          "messageId"
         ]
       },
       "AccountSubmitDto": {
