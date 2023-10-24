@@ -123,6 +123,17 @@ export interface components {
       statusCode: 404;
       message: string;
     };
+    AccountSubmitedDto: {
+      accepted: string[];
+      rejected: string[];
+      ehlo: string[];
+      envelopeTime: number;
+      messageTime: number;
+      messageSize: number;
+      response: string;
+      envelope: Record<string, never>;
+      messageId: string;
+    };
     AccountSubmitDto: {
       to: string[];
       cc: string[];
@@ -358,8 +369,20 @@ export interface operations {
       };
     };
     responses: {
-      201: {
-        content: never;
+      200: {
+        content: {
+          "application/json": {
+            /** @enum {number} */
+            statusCode?: 200;
+            data?: components["schemas"]["AccountSubmitedDto"];
+          };
+        };
+      };
+      /** @description Item not found */
+      404: {
+        content: {
+          "application/json": components["schemas"]["NotFoundDto"];
+        };
       };
     };
   };
