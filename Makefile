@@ -9,11 +9,16 @@ init:
 build:
 	docker build -t $(IMGNAME) .
 
-push:
-	docker push $(IMGNAME)
-
 compile:
-	docker exec -it $(APPNAME) yarn build
+	@docker run --rm -it \
+		-e NODE_ENV=development \
+		-e NODE_TLS_REJECT_UNAUTHORIZED=0 \
+		--add-host host.docker.internal:host-gateway \
+		--name $(APPNAME) \
+		--network dev \
+		-p $(APPPORT):7200 \
+		-v $(CURDIR):/usr/src/app \
+		$(IMGNAME) yarn build
 
 dev:
 	@docker run -it --rm \
@@ -25,6 +30,17 @@ dev:
 		-p $(APPPORT):7200 \
 		-v $(CURDIR):/usr/src/app \
 		$(IMGNAME) yarn start:dev
+
+prod:
+	@docker run -it --rm \
+		-e NODE_ENV=production \
+		-e NODE_TLS_REJECT_UNAUTHORIZED=0 \
+		--add-host host.docker.internal:host-gateway \
+		--name $(APPNAME) \
+		--network dev \
+		-p $(APPPORT):7200 \
+		-v $(CURDIR):/usr/src/app \
+		$(IMGNAME) yarn start:prod
 
 exec:
 	@docker run -it --rm \
