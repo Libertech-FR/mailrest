@@ -20,7 +20,7 @@ import { AbstractController } from '~/_common/abstracts/abstract.controller'
 import { FSWatcher, watch } from 'fs'
 import { Observable } from 'rxjs'
 import { AccountsService } from './accounts.service'
-import { ACCOUNTS_FILE_PATH, AccountsMetadataV1, readAccountsFile } from './accounts.setup'
+import { ACCOUNTS_FILE_PATH, readAccountsFile } from './accounts.setup'
 import { UseRoles } from 'nest-access-control'
 import { ScopesEnum } from '~/_common/enums/scopes.enum'
 import { ActionEnum } from '~/_common/enums/action.enum'
@@ -33,6 +33,7 @@ import { ApiTags } from '@nestjs/swagger'
 import { FilesInterceptor } from '@nestjs/platform-express'
 import { AccountSubmitDto } from '~/accounts/_dto/account-submit.dto'
 import { AccountSubmitedDto } from '~/accounts/_dto/account-submited.dto'
+import { AccountsMetadataV1 } from '~/accounts/_dto/account.dto'
 
 @ApiTags('accounts')
 @Controller('accounts')

@@ -9,7 +9,6 @@ import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { TokensModule } from './tokens/tokens.module'
 import { ImapflowModule } from './imapflow/imapflow.module'
-import { AccountsMetadataV1 } from './accounts/accounts.setup'
 import { APP_GUARD, APP_PIPE } from '@nestjs/core'
 import { CronModule } from '~/accounts/cron/cron.module'
 import { AuthGuard } from '~/_common/guards/auth.guard'
@@ -21,6 +20,7 @@ import { DtoValidationPipe } from '~/_common/pipes/dto-validation.pipe'
 import { ScheduleModule } from '@nestjs/schedule'
 import { MailerModule, MailerOptions } from '@nestjs-modules/mailer'
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter'
+import { AccountsMetadataV1 } from '~/accounts/_dto/account.dto'
 
 @Module({
   imports: [

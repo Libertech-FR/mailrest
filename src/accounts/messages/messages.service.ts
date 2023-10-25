@@ -5,7 +5,7 @@ import { LRUCache } from 'lru-cache'
 import { omit } from 'radash'
 import { AbstractService } from '~/_common/abstracts/abstract.service'
 import { InjectImapflow } from '~/imapflow/imapflow.decorators'
-import { AccountsFileV1 } from '../accounts.setup'
+import { AccountsFileV1 } from '~/accounts/_dto/account.dto'
 
 const defaultSearchOptions = {
   limit: 10,

@@ -5,10 +5,11 @@ import { JwtModuleOptions } from '@nestjs/jwt'
 import { IAuthModuleOptions } from '@nestjs/passport'
 import { BinaryLike, CipherCCMTypes, CipherGCMTypes, CipherKey, createHash } from 'crypto'
 import { SwaggerCustomOptions } from '@nestjs/swagger'
-import setupAccounts, { AccountsMetadataV1 } from './accounts/accounts.setup'
+import setupAccounts from './accounts/accounts.setup'
 import setupTokens, { TokensMetadataV1 } from '~/tokens/tokens.setup'
 import { MailerOptions } from '@nestjs-modules/mailer'
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter'
+import { AccountsMetadataV1 } from '~/accounts/_dto/account.dto'
 
 export interface ConfigInstance {
   application: NestApplicationContextOptions

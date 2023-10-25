@@ -12,13 +12,14 @@ import { ImapFlow } from 'imapflow'
 import { LRUCache } from 'lru-cache'
 import { AbstractService } from '~/_common/abstracts/abstract.service'
 import { InjectImapflow } from '~/imapflow/imapflow.decorators'
-import { AccountsFileV1, AccountsMetadataV1, readAccountsFile, writeAccountsFile } from './accounts.setup'
+import { readAccountsFile, writeAccountsFile } from './accounts.setup'
 import { PartialType } from '@nestjs/swagger'
 import { MailerService } from '@nestjs-modules/mailer'
 import { AccountSubmitDto } from '~/accounts/_dto/account-submit.dto'
 import { AccountSubmitedDto } from '~/accounts/_dto/account-submited.dto'
 import os from 'os'
 import gateway from 'default-gateway'
+import { AccountsFileV1, AccountsMetadataV1 } from '~/accounts/_dto/account.dto'
 
 class InternalAccountMetadataV1 extends PartialType(AccountsMetadataV1) {}
 

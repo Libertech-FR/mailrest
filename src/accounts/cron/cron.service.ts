@@ -4,7 +4,7 @@ import { ModuleRef } from '@nestjs/core'
 import { InjectImapflow } from '~/imapflow/imapflow.decorators'
 import { FetchMessageObject, ImapFlow, MailboxLockObject } from 'imapflow'
 import { LRUCache } from 'lru-cache'
-import { AccountsFileV1, AccountsMetadataV1, readAccountsFile } from '~/accounts/accounts.setup'
+import { readAccountsFile } from '~/accounts/accounts.setup'
 import { HttpService } from '@nestjs/axios'
 import { omit } from 'radash'
 import { createHmac } from 'crypto'
@@ -13,6 +13,7 @@ import FormData from 'form-data'
 import { CronResponseInterface, CronRunOptions } from '~/accounts/cron/cron.interface'
 import { SchedulerRegistry } from '@nestjs/schedule'
 import { CronJob } from 'cron'
+import { AccountsFileV1, AccountsMetadataV1 } from '~/accounts/_dto/account.dto'
 
 export const MAX_WEBHOOK_ATTEMPTS = 3
 export const MAX_WEBHOOK_TIMEOUT = 60_000

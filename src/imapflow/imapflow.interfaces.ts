@@ -1,6 +1,6 @@
 import { ModuleMetadata, Type } from '@nestjs/common'
 import { ImapFlowOptions } from 'imapflow'
-import { AccountsMetadataImapV1 } from '~/accounts/accounts.setup'
+import { AccountsMetadataImapV1 } from '~/accounts/_dto/account.dto'
 
 export interface ImapflowModuleOptions {
   config: {
