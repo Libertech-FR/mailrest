@@ -91,7 +91,7 @@ export class AccountsService extends AbstractService {
     const accounts = await readAccountsFile(this.cache)
     const account = accounts.accounts.find((a) => a.id === id)
     if (!account) throw new NotFoundException(`Account not found: ${id}`)
-    if (!body.template && (!body.text || !body.html)) {
+    if (!body.template && !body.text && !body.html) {
       throw new BadRequestException(`Template, text or html is required !`)
     }
     try {
