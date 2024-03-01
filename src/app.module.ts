@@ -19,7 +19,6 @@ import { AclGuard } from '~/_common/guards/acl.guard'
 import { DtoValidationPipe } from '~/_common/pipes/dto-validation.pipe'
 import { ScheduleModule } from '@nestjs/schedule'
 import { MailerModule, MailerOptions } from '@nestjs-modules/mailer'
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter'
 import { AccountsMetadataV1 } from '~/accounts/_dto/account.dto'
 
 @Module({
